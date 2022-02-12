@@ -1,0 +1,3 @@
+package me.zort.devroomtrial
+
+abstract class DevRoomTrialLoaderFilter: BootInclusionLoaderFiltered.BootInclusionLoaderFilter<DevRoomTrial>

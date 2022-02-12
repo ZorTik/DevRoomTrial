@@ -1,0 +1,9 @@
+name: DevRoomTrial
+version: '${version}'
+main: me.zort.devroomtrial.DevRoomTrial
+api-version: 1.18
+authors: [ ZorT ]
+description: Trial plugin for DevRoom.
+commands:
+  rip:
+    usage: /rip
