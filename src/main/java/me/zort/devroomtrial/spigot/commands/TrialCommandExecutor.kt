@@ -20,9 +20,15 @@ class TrialCommandExecutor(private val plugin: DevRoomTrial): CommandExecutor {
                     }
                     s.sendMessage("§7§oPlugin cannot be loaded")
                 } else s.sendMessage("§aPlugin succssfully reloaded")
+            } else if(args.size == 1 && args[0].equals("givekey", true)) {
+                val locationsService = plugin.deathLocations
+                val item = locationsService.buildDeathKey()
+                s.inventory.addItem(item)
+                s.sendMessage("§eReceived §c1 death key §eitem")
             } else {
                 s.sendMessage("§eUsage:")
                 s.sendMessage("§6* §f/rip §areload §7(Reloads plugin)")
+                s.sendMessage("§6* §f/rip §agivekey §7(Gives death key)")
             }
         } else s.sendMessage("§lHEY! This command can be used only as player!")
         return true

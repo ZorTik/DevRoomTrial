@@ -1,5 +1,7 @@
 package me.zort.devroomtrial.spigot.data;
 
+import com.j256.ormlite.field.DatabaseField;
+import com.j256.ormlite.table.DatabaseTable;
 import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
@@ -10,31 +12,25 @@ import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.data.BlockData;
 
-import javax.persistence.Column;
-import javax.persistence.Convert;
-import javax.persistence.Entity;
-import javax.persistence.Id;
 import java.io.Serializable;
 import java.util.concurrent.TimeUnit;
 
 @EntityAutoConfigure(idClass = String.class)
-@Entity(name = "death_locations")
+@DatabaseTable(tableName = "death_locations")
 @Setter
 @Getter
 public class DeathLocationEntity {
 
-    @Id
-    @Column(nullable = false)
+    @DatabaseField(id = true, canBeNull = false)
     private String name;
 
-    @Convert(converter = DeathLocationEntityLocationConverter.class)
-    @Column(nullable = false)
+    @DatabaseField(persisterClass = DeathLocationEntityLocationPersister.class)
     private Location loc;
 
-    @Convert(converter = DeathLocationEntityReplacementConverter.class)
+    @DatabaseField(persisterClass = DeathLocationEntityReplacementPersister.class)
     private Replacement replacement;
 
-    @Column(nullable = false)
+    @DatabaseField(canBeNull = false)
     private long millis = System.currentTimeMillis();
 
     public boolean hasExpired() {
@@ -70,6 +66,8 @@ public class DeathLocationEntity {
                 block.setType(mat, false);
                 BlockData blockDataDeserialized = Bukkit.createBlockData(blockData);
                 block.setBlockData(blockDataDeserialized, false);
+                Block signBlock = block.getLocation().clone().subtract(0.0, 0.0, 1.0).getBlock();
+                signBlock.setType(Material.AIR);
             }
         }
 

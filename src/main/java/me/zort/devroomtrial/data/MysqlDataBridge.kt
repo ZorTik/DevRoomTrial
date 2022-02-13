@@ -2,6 +2,7 @@ package me.zort.devroomtrial.data
 
 import com.j256.ormlite.dao.Dao
 import com.j256.ormlite.dao.DaoManager
+import com.j256.ormlite.jdbc.JdbcConnectionSource
 import com.j256.ormlite.jdbc.JdbcPooledConnectionSource
 import me.zort.devroomtrial.DevRoomTrial
 import me.zort.devroomtrial.data.annotation.EntityAutoConfigure
@@ -33,6 +34,12 @@ class MysqlDataBridge: DataBridge<JdbcPooledConnectionSource, MysqlCredentials> 
             credentials.buildJdbcUrl()
         }
         connection = JdbcPooledConnectionSource(jdbcUrl, credentials.user, credentials.pw)
+        val cClass = JdbcConnectionSource::class.java
+        val cIField = cClass.getDeclaredField("initialized");
+        cIField.isAccessible = true
+        if(!(cIField.get(connection) as Boolean)) {
+            return null
+        }
         if(jpaEntitiesFinderPackageUrl != null) {
             val ref = refCache[jpaEntitiesFinderPackageUrl].let {
                 return@let if(it == null) {
@@ -74,7 +81,7 @@ class MysqlDataBridge: DataBridge<JdbcPooledConnectionSource, MysqlCredentials> 
     @Suppress("UNCHECKED_CAST")
     fun <T, ID> getDao(entityClass: Class<T>, idClass: Class<ID>): Dao<T, ID> = (daoCache.entries.firstOrNull { (id, _) ->
         id.compare(entityClass, idClass)
-    }?: let {
+    }?.value?: let {
         val d: Dao<T, ID> = DaoManager.createDao(connection, entityClass)
         daoCache[DaoIdentifier(entityClass, idClass)] = d
         d

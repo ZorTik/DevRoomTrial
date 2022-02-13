@@ -6,7 +6,10 @@ import lombok.Getter;
 import lombok.Setter;
 import me.zort.devroomtrial.data.MysqlDataBridge;
 import me.zort.devroomtrial.spigot.DeathLocationsService;
+import me.zort.devroomtrial.spigot.configuration.Message;
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
+import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.reflections.Reflections;
 import org.reflections.scanners.FieldAnnotationsScanner;
@@ -60,11 +63,18 @@ public final class DevRoomTrial extends JavaPlugin {
             saveDefaultConfig();
         } else {
             getConfig().options().copyDefaults(true);
-            try {
-                getConfig().save(configFile);
-            } catch (IOException e) {
-                e.printStackTrace();
+        }
+        for (Message message : Message.values()) {
+            FileConfiguration config = getConfig();
+            String path = "messages." + message.getKey();
+            if(!config.contains(path)) {
+                config.set(path, message.getDefValue());
             }
+        }
+        try {
+            getConfig().save(configFile);
+        } catch (IOException e) {
+            e.printStackTrace();
         }
         bootstrap = new DevRoomTrialBootstrap(this);
         List<String> errors = bootstrap.reload();
@@ -75,7 +85,6 @@ public final class DevRoomTrial extends JavaPlugin {
             Bukkit.getServer().getPluginManager().disablePlugin(this);
             return;
         }
-        // TODO: Continue
     }
 
     @Override
@@ -83,6 +92,10 @@ public final class DevRoomTrial extends JavaPlugin {
         if(bootstrap != null) {
             bootstrap.unload();
         }
+    }
+
+    public String getConfigMessage(Message message) {
+        return ChatColor.translateAlternateColorCodes('&', getConfig().getString("messages." + message.getKey(), message.getDefValue()));
     }
 
 }

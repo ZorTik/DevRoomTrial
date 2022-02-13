@@ -7,7 +7,7 @@ class MysqlCredentials(val url: String, val port: Int, val db: String, val user:
     }
 
     fun buildJdbcUrl(sqlArchitecture: String): String {
-        return "jdbc:$sqlArchitecture://$url:$port/$db"
+        return "jdbc:$sqlArchitecture://$url:$port/$db?autoReconnect=true&useSSL=false&allowPublicKeyRetrieval=true"
     }
 
     override fun getData(): MutableMap<String, Any> {

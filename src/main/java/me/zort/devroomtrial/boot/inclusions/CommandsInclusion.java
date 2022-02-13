@@ -27,4 +27,9 @@ public class CommandsInclusion implements DevRoomTrialInclusion {
         return null;
     }
 
+    @Override
+    public int getPriority() {
+        return 1;
+    }
+
 }

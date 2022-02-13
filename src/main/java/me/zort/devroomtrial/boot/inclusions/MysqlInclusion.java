@@ -1,13 +1,19 @@
 package me.zort.devroomtrial.boot.inclusions;
 
+import com.j256.ormlite.field.DataPersisterManager;
+import com.j256.ormlite.jdbc.JdbcPooledConnectionSource;
+import com.j256.ormlite.table.TableUtils;
 import me.zort.devroomtrial.DevRoomTrial;
 import me.zort.devroomtrial.DevRoomTrialInclusion;
 import me.zort.devroomtrial.data.MysqlCredentials;
 import me.zort.devroomtrial.data.MysqlDataBridge;
+import me.zort.devroomtrial.spigot.data.DeathLocationEntity;
+import me.zort.devroomtrial.spigot.data.DeathLocationEntityLocationPersister;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.jetbrains.annotations.Nullable;
 
+import java.sql.SQLException;
 import java.util.logging.Logger;
 
 public class MysqlInclusion implements DevRoomTrialInclusion {
@@ -27,7 +33,17 @@ public class MysqlInclusion implements DevRoomTrialInclusion {
                 section.getString("user", "user"),
                 section.getString("password", "password")
         );
-        if(dataBridge.connect(credentials) != null) {
+        /*DataPersisterManager.registerDataPersisters(
+                DeathLocationEntityLocationPersister.getSingleton()
+        );*/
+        JdbcPooledConnectionSource connection;
+        if((connection = dataBridge.connect(credentials, "mariadb")) != null) {
+            try {
+                TableUtils.createTableIfNotExists(connection, DeathLocationEntity.class);
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+            base.setSql(dataBridge);
             logger.info("Successfully connected to MySQL.");
             return true;
         }
@@ -48,6 +64,11 @@ public class MysqlInclusion implements DevRoomTrialInclusion {
         return base.getSql() != null
                 ? "SQL is already loaded. Please unload first."
                 : null;
+    }
+
+    @Override
+    public int getPriority() {
+        return 3;
     }
 
 }

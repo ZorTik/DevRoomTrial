@@ -24,7 +24,9 @@ open class BootstrapSequence<T>(private val base: T, private val inclusions: Mut
                 .filterNotNull()
                 .toMutableList()
         }
-        for (inclusion in inclusions) {
+        for (inclusion in inclusions.sortedByDescending {
+            it.getPriority()
+        }) {
             if(!try {
                     inclusion.load(base)
                 } catch(ex: Exception) {

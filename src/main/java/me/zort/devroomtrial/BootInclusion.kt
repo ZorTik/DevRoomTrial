@@ -10,5 +10,8 @@ interface BootInclusion<T> {
      * @return Verification error message
      */
     fun canBoot(base: T): String?
+    fun getPriority(): Int {
+        return 1
+    }
 
 }
