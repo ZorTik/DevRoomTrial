@@ -15,14 +15,22 @@ open class BootstrapSequence<T>(private val base: T, private val inclusions: Mut
                 return it.toMutableList()
             }
         }
+        val errMessages = inclusions
+            .map { it.canBoot(base) }
+        if(errMessages.any {
+                it != null
+            }) {
+            return errMessages
+                .filterNotNull()
+                .toMutableList()
+        }
         for (inclusion in inclusions) {
-            var success = false
-            try {
-                success = inclusion.load(base)
-            } catch(ex: Exception) {
-                ex.printStackTrace()
-            }
-            if(!success) {
+            if(!try {
+                    inclusion.load(base)
+                } catch(ex: Exception) {
+                    ex.printStackTrace()
+                    false
+                }) {
                 unload(true)
                 return mutableListOf(
                     "Internal: An unexpected error occurred!"

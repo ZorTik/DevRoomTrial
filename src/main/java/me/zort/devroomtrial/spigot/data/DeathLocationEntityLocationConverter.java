@@ -8,9 +8,11 @@ import org.bukkit.Location;
 import org.bukkit.World;
 
 import javax.persistence.AttributeConverter;
+import javax.persistence.Converter;
 
 import static me.zort.devroomtrial.DevRoomTrial.GSON;
 
+@Converter
 public class DeathLocationEntityLocationConverter implements AttributeConverter<Location, String> {
 
     @Override
