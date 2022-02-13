@@ -206,20 +206,24 @@ internal class DeathLocationsService(private val plugin: DevRoomTrial, private v
         val content = arrayOf(*p.inventory.contents)
         p.inventory.clear()
         e.drops.clear()
-        saveLocationAsync(p.name, p.location, content).thenRun {
-            val config = plugin.config
-            val d = config.getLong("times.chest-announce-delay")
-            lat(d) {
-                val chestLoc = getDeathChestLocation(p.name)
-                if(chestLoc != null) {
-                    plugin.getConfigMessage(Message.CHEST_ANNOUNCE)
-                        .replace("%player%", p.name)
-                        .replace("%x%", chestLoc.loc.blockX.toString())
-                        .replace("%y%", chestLoc.loc.blockY.toString())
-                        .replace("%z%", chestLoc.loc.blockZ.toString())
+        cfEx(
+            saveLocationAsync(p.name, p.location, content).thenRun {
+                val config = plugin.config
+                val d = config.getLong("times.chest-announce-delay")
+                lat(d) {
+                    val chestLoc = getDeathChestLocation(p.name)
+                    if(chestLoc != null) {
+                        Bukkit.broadcastMessage(
+                            plugin.getConfigMessage(Message.CHEST_ANNOUNCE)
+                                .replace("%player%", p.name)
+                                .replace("%x%", chestLoc.loc.blockX.toString())
+                                .replace("%y%", chestLoc.loc.blockY.toString())
+                                .replace("%z%", chestLoc.loc.blockZ.toString())
+                        )
+                    }
                 }
             }
-        }
+        )
     }
 
     @EventHandler
